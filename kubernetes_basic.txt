@@ -1,0 +1,72 @@
+kubectl commands
+The most important and frequently used commands in kubectl are the run and create
+
+run - Creates a deployment or job to manage the created container(s).
+
+expose - Searches for a deployment, service, replica set, replication controller or pod by name and uses the selector for that resource as the selector for a new service on the specified port. A deployment or replica set will be exposed as a service only if its selector is convertible to a selector that service supports, i.e. when the selector contains only the matchLabels component.
+version - Print the client and server version information for the current context
+
+config - Modify kubeconfig files using subcommands and seeing the connection details
+
+App Management Commands cont
+label - Update the labels of Kubernetes Objects
+
+replace - Replace a resource by filename or stdin. It uses YAML or JSON filesto replace the existing resources
+
+rolling-update - Perform a rolling update of the given ReplicationController.
+
+rollout - Manage the rollout of a resource.
+
+Valid resource types include:
+
+deployments
+daemonsets
+statefulsets
+scale - Set a new size for a Deployment, ReplicaSet, Replication Controller, or StatefulSet. Scale also allows to specify the conditions when the scaling should take place.
+
+set- Configure application resources. These commands help you make changes to existing application resources.
+
+
+Working with Apps
+attach-is used to attch the object to a process that is already running inside an existing container.
+
+cp- Copy files and directories to and from containers.
+
+describe - Describes the specified Kubernetes resource.
+
+exec - Execute a command in a container.
+
+logs- Print the logs for a container in a pod or specified resource. If the pod has only one container, the container name is optional.
+
+proxy - Creates a proxy server or application-level gateway between the external world and Kubernetes API server.
+
+top - Display Resource (CPU/Memory/Storage) usage.
+
+Cluster managements commands
+api-versions - Print the supported API versions on the server, in the form of "group/version"
+
+cluster-info - Display addresses of the master and services with label kubernetes.io/cluster-service=true To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+
+drain- Drain node of all its resources like pods, services,etc for maintenance.
+
+The kubectl proxy command authenticates the Kubernetes API server on the Master node.
+By using this command we can access the dashboard from the localhost browser from the following url: http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/kubernetes-dashboard:/proxy/#!/overview?namespace=default.
+
+
+Kubernetes Objects
+Objects are used to maintain the desired state of a cluster.
+
+Object Fields: Objects have two fields
+
+Specs: Define the desired state of the object.
+Status: Defines the actual state of the object.
+Describing Object:
+
+Objects are described using a .yaml or .json file.
+It contains the following requirements
+apiversion.
+kind/type of object
+metadata
+spec, the desired state of the object
+$kubectl create command is used to create an object.
+Every Object has an UID, a system generated string that uniquely identifies the object.

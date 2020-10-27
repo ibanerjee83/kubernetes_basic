@@ -1,0 +1,124 @@
+Services
+Service in Kubernetes is used to defines a logical set of Pods and a policy by which to access them. Services are used for communications among different pods. Service is defined using YAML or JSON file. The set of Pods targeted by a Service is usually determined by a LabelSelector. We will learn more about Labels and Selectors later.
+
+Services are used to expose the pods outside the cluster. Services are exposed in different ways using different ServiceSpecs such as
+
+ClusterIP
+NodePort
+Load Balancer
+ExternalName
+
+Kube-proxy
+Every Worker node runs a daemon process called kube-proxy
+The kube - proxy keeps track of API server of the master node for addition and deletion of Service endpoints.
+For every Service created in a worker node, the kube-proxy configures the IP tables rules to handle the traffic for its ClusterIP and forwards it to service endpoints
+When the service is removed, kube-proxy removes the iptables rules on all worker nodes as well.
+
+Service Discovery
+Service discovery at runtime is an important concept because all communications from external world to Kubernetes occurs through Services.
+
+Environment Variables: When the Pod starts on a worker node, the kubelet adds a set of variables called Environment Variables in the Pod for all active Services. For example, if we have an active Service called redis-master, having Cluster-IP 172.10.0.12 and exposing Port -7307, the environment variables created will be as shown
+REDIS_MASTER_SERVICE_HOST=172.10.0.12
+REDIS_MASTER_SERVICE_PORT=7307
+REDIS_MASTER_PORT=tcp://172.10.0.12:7307
+REDIS_MASTER_PORT_7307_TCP=tcp://172.10.0.12:7307
+REDIS_MASTER_PORT_7307_TCP_PROTO=tcp
+REDIS_MASTER_PORT_7307_TCP_PORT=7307
+REDIS_MASTER_PORT_7307_TCP_ADDR=172.10.0.12
+DNS : There are addon components in Kubernetes called DNS which creates and manages the DNS names for all the Services created. The format looks like my-svc.my-namespace.svc.cluster.local.
+
+Types of Services
+In the previous card the different type of specs for Service creation has been discussed. In this card the types of Services are defined.
+
+Cluster IP: Cluster IP is the default Service type, in this type of Service there is virtual IP that can be used for communication only within the cluster.
+NodePort: In NodePort Service there is a virtual IP address along with a port number in the range of 30000-32767, that maps to the respective Service from all the worker nodes.
+A default port number is selected by the Kubernetes while creating this type of Service. NodePort type Service is used when we want to communicate with the external world.
+
+Types of Services...
+Load Balancer: This type of Service uses external load balancer, the Cluster IP and NodePort for this type of Service is automatically created and the load balancing is done by external load balancer.
+External IP: This type of Services are mapped to External IP address if it can route worker nodes. The External IPs are not managed by Kubernetes.
+
+
+
+minikube start
+minikube version
+minikube version: v0.28.2
+
+
+kubectl get nodes
+NAME       STATUS     ROLES     AGE       VERSION
+minikube   NotReady   <none>    3s        v1.10.0
+$ kubectl cluster-info
+Kubernetes master is running at https://172.17.0.17:8443
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+$ kubectl cluster-info
+Kubernetes master is running at https://172.17.0.17:8443
+
+kubectl run firstapp --image=gcr.io/google-samples/kubernetes-bootcamp:v1 --port=8080
+deployment.apps/firstapp created
+$ kubectl get deployments
+NAME       DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+firstapp   1         1         1            1           3s
+
+ kubectl describe deployments/firstapp
+Name:                   firstapp
+Namespace:              default
+CreationTimestamp:      Tue, 27 Oct 2020 09:55:50 +0000
+Labels:                 run=firstapp
+Annotations:            deployment.kubernetes.io/revision=1
+Selector:               run=firstapp
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  run=firstapp
+  Containers:
+   firstapp:
+    Image:        gcr.io/google-samples/kubernetes-bootcamp:v1
+    Port:         8080/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   firstapp-65898bd576 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  28s   deployment-controller  Scaled up replica set firstapp-65898bd576 to 1
+  
+ #kubectl expose deployment/firstapp --type="NodePort" --port 8080
+service/firstapp exposed
+
+$ export NODE_PORT=$(kubectl get services/firstapp -o go-template='{{(index .spec.ports 0).nodePort}}')
+$ echo NODE_PORT=$NODE_PORT
+NODE_PORT=30011
+
+
+
+ minikube start
+Starting local Kubernetes v1.10.0 cluster...
+Starting VM...
+Getting VM IP address...
+Moving files into cluster...
+Setting up certs...
+Connecting to cluster...
+Setting up kubeconfig...
+Starting cluster components...
+Kubectl is now configured to use the cluster.
+Loading cached images from config file.
+$ minikube version
+minikube version: v0.28.2
+$ kubectl cluster-info
+Kubernetes master is running at https://172.17.0.18:8443
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+$ docker -v
+Docker version 17.03.0-ce, build 3a232c8
